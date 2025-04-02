@@ -1,7 +1,7 @@
 // Import Firebase SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-import { getFirestore, collection, addDoc, deleteDoc, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, deleteDoc, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Firebase Configuration (Replace with your config)
 const firebaseConfig = {
@@ -24,6 +24,21 @@ const db = getFirestore(app);
 
 const currentPage = window.location.pathname;
 
+const songImage = document.getElementById("songImage");
+const thumbnailInput = document.getElementById("thumbnailInput");
+
+thumbnailInput.addEventListener('change', function (e) {
+    if (e.target.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (event) {
+            songImage.setAttribute("src", event.target.result);
+            // $("#hide").empty().append(songImage);
+        };
+        reader.readAsDataURL(e.target.files[0]);
+        // document.body.append('You selected ' + e.target.files[0].name);
+    }
+});
+
 // Upload Song with Thumbnail
 if (currentPage.includes("upload.html")) {
     const songNameInput = document.getElementById("exampleInputName1");
@@ -31,13 +46,17 @@ if (currentPage.includes("upload.html")) {
     const fileInput = document.getElementById("fileInput");
     const thumbnailInput = document.getElementById("thumbnailInput");
     const uploadBtn = document.getElementById("uploadBtn");
+    const exampleModalCenter = document.getElementById("exampleModalCenter");
     uploadBtn.addEventListener("click", async () => {
         const file = fileInput.files[0];
         const thumbnail = thumbnailInput.files[0];
         const songName = songNameInput.value.trim();
         const author = authorInput.value.trim();
 
-        if (!file || !thumbnail || !author) {
+        let modal = new bootstrap.Modal(exampleModalCenter);
+        modal.show();
+
+        if (!file || !thumbnail || !author || !songName) {
             return alert("Please select a song, thumbnail, and enter author name!");
         }
 
@@ -92,14 +111,14 @@ if (currentPage.includes("upload.html")) {
         songList.innerHTML = "";
         const querySnapshot = await getDocs(collection(db, "songs"));
 
-        querySnapshot.forEach(doc => {
-            const song = doc.data();
+        querySnapshot.forEach(docResult => {
+            const song = docResult.data();
 
             // Create song card
             // const songCard = document.createElement("div");
             // songCard.classList.add("song-card");
             const songCard = document.createElement("tr");
-            songCard.setAttribute("id", doc.id);
+            songCard.setAttribute("id", docResult.id);
 
             //     songCard.innerHTML = `
             //     <img src="${song.thumbnailURL}" alt="${song.name}">
@@ -129,8 +148,9 @@ if (currentPage.includes("upload.html")) {
             </td>-->
             <td>
                 <!--<a href="#!"><i class="ik ik-edit f-16 mr-15 text-green"></i></a>-->
-                <a href="#!" id="${doc.id}-play"><i class="ik ik-play f-16 mr-15 text-green"></i></a>
-                <a href="#!" id="${doc.id}-remove"><i class="ik ik-trash-2 f-16 text-red"></i></a>
+                <a href="#!" id="${docResult.id}-play"><i class="ik ik-play f-16 mr-15 text-green"></i></a>
+                <a href="#!" id="${docResult.id}-edit" data-toggle="modal" data-target="#exampleModalCenter"><i class="ik ik-edit f-16 mr-15 text-primary"></i></a>
+                <a href="#!" id="${docResult.id}-remove"><i class="ik ik-trash-2 f-16 mr-15 text-red"></i></a>
             </td>`;
 
             // const songPlayer = document.getElementById("songPlayer");
@@ -144,15 +164,99 @@ if (currentPage.includes("upload.html")) {
             songList.appendChild(songCard);
 
             const songPlayer = document.getElementById("songPlayer");
-            const songPlayBtn = document.getElementById(`${doc.id}-play`);
-            const songRemoveBtn = document.getElementById(`${doc.id}-remove`);
+            const songPlayBtn = document.getElementById(`${docResult.id}-play`);
+            const songEditBtn = document.getElementById(`${docResult.id}-edit`);
+            const songRemoveBtn = document.getElementById(`${docResult.id}-remove`);
+            const songNameInput = document.getElementById("exampleInputName1");
+            const songAuthorInput = document.getElementById("exampleInputAuthor2");
+            const thumbnailInput = document.getElementById("thumbnailInput");
+            const fileInput = document.getElementById("fileInput");
+            const saveChangesBtn = document.getElementById("save-changes");
+            const closeModalBtn = document.getElementById("close-modal");
+            let modal = new bootstrap.Modal(document.getElementById("exampleModalCenter"));
+            // const songImage = document.getElementById("songImage");
+            // const thumbnailInput = document.getElementById("thumbnailInput");
+
+            // thumbnailInput.addEventListener('change', function (e) {
+            //     if (e.target.files[0]) {
+            //         var reader = new FileReader();
+            //         reader.onload = function (event) {
+            //             songImage.attr("src", event.target.result);
+            //             // $("#hide").empty().append(songImage);
+            //         };
+            //         reader.readAsDataURL(myFile);
+            //         document.body.append('You selected ' + e.target.files[0].name);
+            //     }
+            // });
 
             songPlayBtn.addEventListener("click", async () => {
                 songPlayer.src = song.songURL;
             });
 
+            songEditBtn.addEventListener("click", async () => {
+                songNameInput.value = song.name;
+                songAuthorInput.value = song.author;
+                songImage.setAttribute("src", song.thumbnailURL);
+
+                async function saveChanges() {
+                    const newName = songNameInput.value.trim();
+                    const newAuthor = songAuthorInput.value.trim();
+                    const newThumbnail = thumbnailInput.files[0];
+                    const newSong = fileInput.files[0];
+
+                    if (!newName || !newAuthor) {
+                        return alert("Please select a song, thumbnail, and enter author name!");
+                    }
+
+                    if(newName === song.name && newAuthor === song.author) {
+                        return alert("You can't update the music with the same details and informations");
+                    }
+
+                    let updatedData = { name: newName, author: newAuthor };
+
+                    if (newThumbnail) {
+                        const newThumbRef = ref(storage, `thumbnails/${newThumbnail.name}`);
+                        const thumbUpload = await uploadBytesResumable(newThumbRef, newThumbnail);
+                        const newThumbURL = await getDownloadURL(thumbUpload.ref);
+
+                        // Delete old thumbnail
+                        const oldThumbRef = ref(storage, song.thumbnailPath);
+                        await deleteObject(oldThumbRef);
+
+                        updatedData.thumbnailURL = newThumbURL;
+                        updatedData.thumbnailPath = newThumbRef.fullPath;
+                    }
+
+                    if (newSong) {
+                        const newSongRef = ref(storage, `songs/${newSong.name}`);
+                        const songUpload = await uploadBytesResumable(newSongRef, newSong);
+                        const newSongURL = await getDownloadURL(songUpload.ref);
+
+                        // Delete old thumbnail
+                        const oldSongRef = ref(storage, song.songPath);
+                        await deleteObject(oldSongRef);
+
+                        updatedData.songURL = newSongURL;
+                        updatedData.songPath = newSongRef.fullPath;
+                    }
+
+                    await updateDoc(doc(db, "songs", docResult.id), updatedData);
+
+                    closeModalBtn.click();
+
+                    loadSongs();
+                }
+
+                // saveChangesBtn.addEventListener("click", async function eventHandler() {
+                    
+
+                //     ///this will execute only once
+                //     // alert(song.name);
+                // });
+            });
+
             songRemoveBtn.addEventListener("click", async () => {
-                deleteSong(doc.id, song.songPath, song.thumbnailPath);
+                deleteSong(docResult.id, song.songPath, song.thumbnailPath);
             });
 
         });

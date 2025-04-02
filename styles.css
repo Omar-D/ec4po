@@ -62,3 +62,7 @@ td {
     width: 40px !important;
     height: 40px !important;
 }
+
+.feed-item:hover {
+    background-color: #ccc;
+}

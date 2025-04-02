@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Ec4po</title>
     <script type="module" src="app.js" defer></script>
 
     <link rel="icon" href="logo.png" type="image/x-icon" />
-    <meta name="keywords" content="Naperva, Ecebpm, Ece, Ec4po, Denizlere, Bırakma">
+    <meta name="keywords" content="Naperva, Ecebpm, Ece, Ec4po, Denizlere, Bırakma, Samanyolu">
     <meta name="description" content="Naperva (Ecebpm) sanatçının şarkılarını bedavaya dinleyin">
 
     <meta property="og:title" content="Ec4po" />
@@ -169,10 +169,13 @@
                         <nav id="main-menu-navigation" class="navigation-main">
                             <!-- <div class="nav-lavel">Navigation</div> -->
                             <div class="nav-item">
-                                <a href="index.html"><i class="ik ik-music"></i><span>Songs</span></a>
+                                <a href="profile.html"><i class="ik ik-home"></i><span>Anasayfa</span></a>
+                            </div>
+                            <div class="nav-item">
+                                <a href="index.html"><i class="ik ik-music"></i><span>Şarkılarım</span></a>
                             </div>
                             <div class="nav-item active">
-                                <a href="upload.html"><i class="ik ik-upload"></i><span>Publish Song</span></a>
+                                <a href="upload.html"><i class="ik ik-upload"></i><span>Şarkı Yayınla</span></a>
                             </div>
                         </nav>
                     </div>
@@ -186,8 +189,8 @@
                                 <div class="page-header-title">
                                     <i class="ik ik-upload bg-purple"></i>
                                     <div class="d-inline">
-                                        <h5>Publish Song</h5>
-                                        <span>Add your song to the published songs</span>
+                                        <h5>Şarkı Yayınla</h5>
+                                        <span>Yeni şarkını paylaşılan şarkılar listesine ekle</span>
                                     </div>
                                 </div>
                             </div>
@@ -198,7 +201,7 @@
                                             <a href="index.html"><i class="ik ik-home"></i></a>
                                         </li>
                                         <li class="breadcrumb-item">
-                                            <a href="upload.html">Publish Song</a>
+                                            <a href="#">Şarkı Yayınla</a>
                                         </li>
                                         <!-- <li class="breadcrumb-item active" aria-current="page">Data Table</li> -->
                                     </ol>
@@ -209,56 +212,59 @@
 
                     <div class="card">
                         <div class="card-header">
-                            <h3>Upload New Song</h3>
+                            <h3>Yeni Şarkı Yükle</h3>
                         </div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="exampleInputName1">Song Title</label>
+                                <img id="songImage" class="form-control" style="height: 300px !important; object-fit: contain; border: 0px !important;">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputName1">Şarkının Adı</label>
                                 <input type="text" class="form-control" id="exampleInputName1"
                                     placeholder="Song Title">
                             </div>
                             <div class="form-group">
-                                <label for="exampleInputName1">Author Name</label>
+                                <label for="exampleInputName1">Sanatçının Adı</label>
                                 <input type="text" class="form-control" id="exampleInputAuthor2"
                                     placeholder="Author Name">
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Song Thumbnail</label>
+                                        <label>Şarkının Kapak Resmi</label>
                                         <input type="file" name="img[]" class="file-upload-default" id="thumbnailInput" accept="image/*">
                                         <div class="input-group col-xs-12">
                                             <input type="text" class="form-control file-upload-info" disabled
                                                 placeholder="Upload Song Thumbnail">
                                             <span class="input-group-append">
                                                 <button class="file-upload-browse btn btn-primary"
-                                                    type="button">Upload</button>
+                                                    type="button">Resim Yükle</button>
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Song Audio</label>
+                                        <label>Şarkının Ses Dosyası</label>
                                         <input type="file" name="audio[]" class="file-upload-default" id="fileInput" accept="audio/*">
                                         <div class="input-group col-xs-12">
                                             <input type="text" class="form-control file-upload-info" disabled
                                                 placeholder="Upload Song Audio">
                                             <span class="input-group-append">
                                                 <button class="file-upload-browse btn btn-primary"
-                                                    type="button">Upload</button>
+                                                    type="button">Ses Yükle</button>
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <!-- <button class="btn btn-primary mr-2" id="uploadBtn" data-toggle="modal" data-target="#exampleModalCenter">Submit</button> -->
-                            <button type="button" id="uploadBtn" class="btn btn-info" data-toggle="modal" data-target="#exampleModalCenter"><i class="ik ik-share"></i>Upload</button>
-                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterLabel" aria-hidden="true">
+                            <button type="button" id="uploadBtn" class="btn btn-info w-100"><i class="ik ik-share"></i>Yükle</button>
+                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterLabel">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalCenterLabel">Uploading</h5>
+                                            <h5 class="modal-title" id="exampleModalCenterLabel">Yükleniyor</h5>
                                         </div>
                                         <div class="modal-body">
                                             <div class="d-flex justify-content-between align-items-center">
