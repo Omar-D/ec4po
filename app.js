@@ -208,7 +208,7 @@ if (currentPage.includes("upload.html")) {
                         return alert("Please select a song, thumbnail, and enter author name!");
                     }
 
-                    if(newName === song.name && newAuthor === song.author) {
+                    if((newName === song.name && newAuthor === song.author) && !newThumbnail && !newSong) {
                         return alert("You can't update the music with the same details and informations");
                     }
 
@@ -247,12 +247,11 @@ if (currentPage.includes("upload.html")) {
                     loadSongs();
                 }
 
-                // saveChangesBtn.addEventListener("click", async function eventHandler() {
-                    
-
-                //     ///this will execute only once
-                //     // alert(song.name);
-                // });
+                saveChangesBtn.addEventListener("click", async function eventHandler() {
+                    ///this will execute only once
+                    // alert(song.name);
+                    saveChanges();
+                });
             });
 
             songRemoveBtn.addEventListener("click", async () => {
